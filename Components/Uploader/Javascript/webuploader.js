@@ -6,6 +6,14 @@
  *
  * AMD API 内部的简单不完全实现，请忽略。只有当WebUploader被合并成一个文件的时候才会引入。
  */
+var Uploader_Home = document.getElementsByTagName("script");
+Uploader_Home = Uploader_Home[Uploader_Home.length-1].src;
+Uploader_Home = Uploader_Home.split("/");
+Uploader_Home.pop();
+Uploader_Home.pop();
+Uploader_Home.push("");
+Uploader_Home = Uploader_Home.join("/");
+
 (function( root, factory ) {
     var modules = {},
 

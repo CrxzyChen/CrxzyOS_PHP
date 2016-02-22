@@ -76,7 +76,7 @@ jQuery(function() {
         },
 
         // swf文件路径
-        swf: Urlhost+"/Components/Uploader/Uploader.swf",
+        swf: Uploader_Home+"SWF/Uploader.swf",
 
         disableGlobalDnd: true,
 
