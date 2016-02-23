@@ -13,6 +13,5 @@ class HeaderComponent extends \Block
 {
     public function Start()
     {
-
     }
 }

@@ -2,7 +2,7 @@
 
 /**
  * Created by PhpStorm.
- * User: ĞñÑô
+ * User: æ—­é˜³
  * Date: 2016/1/31
  * Time: 23:59
  */
@@ -15,34 +15,31 @@ class Block
     public $Head = array();
     public $Body = '';
     public $Attrute = '';
-    public $IsCompletion = '';//ÊÇ·ñÊÇÍêÕû½á¹¹
+    public $IsCompletion = '';//æ˜¯å¦æ˜¯å®Œæ•´ç»“æ„
 
     /*
-     * ÓÃÓÚ´æ·Å
+     * ç”¨äºå­˜æ”¾
      */
     public function Find($name)
     {
-        if($this->Component)
-        {
-            foreach($this->Component as $key=>$value)
-            {
-                if($key==$name)
+        if ($this->Component) {
+            foreach ($this->Component as $key => $value) {
+                if ($key == $name)
                     return $value;
-                else
-                {
-                    if(($result=$value->Find($name))!=null)
+                else {
+                    if (($result = $value->Find($name)) != null)
                         return $value->Find($name);
                 }
             }
             return null;
-        }
-        else
+        } else
             return null;
     }
+
     public function LoadHead()
     {
         /*
-         * ½âÎöÄ¬ÈÏÍ·
+         * è§£æé»˜è®¤å¤´
          */
         if (IS_DEFAULTHEAD) {
             $head = file_get_contents(DIR_MODELS . "Head/DefaultHead.html");
@@ -63,7 +60,7 @@ class Block
         return $this->Head;
     }
 
-    public function ClearRepetitionHead()//³ıÈ¥ÖØ¸´Í·ÎÄ¼şĞÅÏ¢
+    public function ClearRepetitionHead()//é™¤å»é‡å¤å¤´æ–‡ä»¶ä¿¡æ¯
     {
         $SRC = array();
         foreach ($this->Head as $key => $heads) {
@@ -79,7 +76,22 @@ class Block
             out:
         }
     }
+    public function recurse_copy($src,$dst) {  // åŸç›®å½•ï¼Œå¤åˆ¶åˆ°çš„ç›®å½•
 
+        $dir = opendir($src);
+        @mkdir($dst);
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                if ( is_dir($src . '/' . $file) ) {
+                    $this->recurse_copy($src . '/' . $file,$dst . '/' . $file);
+                }
+                else {
+                    copy($src . '/' . $file,$dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+    }
     public function LoadComponent()
     {
         if (preg_match_all("/(<)component[\s\S]*?(>)<\/component(>)/i", $this->Body, $match, PREG_OFFSET_CAPTURE)) {
@@ -88,40 +100,45 @@ class Block
                 $Attrute = array();
                 $Attrute["begin"] = $match[1][$key][1];
                 $Attrute["end"] = $match[3][$key][1] + 1;
-                $Attrute["offset"] = $match[2][$key][1] + 1;//¼ÇÂ¼×é¼ş²åÈëµØÖ·
+                $Attrute["offset"] = $match[2][$key][1] + 1;//è®°å½•ç»„ä»¶æ’å…¥åœ°å€
                 preg_match_all("/(\S*)\s*=\s*(['\"])([\S\s]*?)\\2/i", $components, $val);
-                foreach ($val[1] as $key=>$value) {
-                    $val[3][$key] = preg_replace("/\s+/i"," ",$val[3][$key]);
+                foreach ($val[1] as $key => $value) {
+                    $val[3][$key] = preg_replace("/\s+/i", " ", $val[3][$key]);
                     $val[3][$key] = trim($val[3][$key]);
-                    if(sizeof($buf = explode(" ",$val[3][$key]))>1)
-                    {
+                    if (sizeof($buf = explode(" ", $val[3][$key])) > 1) {
                         $Attrute[$value] = $buf;
-                    }else
-                    {
+                    } else {
                         $Attrute[$value] = $val[3][$key];
                     }
-
                 }
+                App::$Appname;
                 if (!isset($Attrute["name"]))
                     $Attrute["name"] = $Attrute["component"];
                 if (is_dir(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"])) {
                     System::Load(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"] . DIRECTORY_SEPARATOR . $Attrute["component"] . "Component.php");
                     $class = new ReflectionClass(App::$Appname . "\\" . $Attrute["component"] . "Component");
-                    if (is_file(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"] . DIRECTORY_SEPARATOR . (isset($Attrute["view"])?$Attrute["view"].".html":"index.html"))) {
+                    if (is_file(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"] . DIRECTORY_SEPARATOR . (isset($Attrute["view"]) ? $Attrute["view"] . ".html" : "index.html"))) {
                         $obj = $class->newInstance(file_get_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"] . DIRECTORY_SEPARATOR . "index.html"));
                     } else {
                         $obj = $class->newInstance("");
                     }
+                    $Attrute["store"]="local";
+                } else if (isset($Attrute["inherit"]) && $Attrute["inherit"] == true && is_dir(DIR_COMPONENTS . $Attrute["component"])) {
+                    $this->recurse_copy(DIR_COMPONENTS . $Attrute["component"],App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"]);
+                    $file = file_get_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"].DIRECTORY_SEPARATOR . $Attrute["component"] ."Component.php");
+                    file_put_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"].DIRECTORY_SEPARATOR . $Attrute["component"] ."Component.php",preg_replace("/namespace\s*\S*?;/i","namespace ".App::$Appname.";",$file));
+                    $Attrute["store"]="local";
                 } else if (is_dir(DIR_COMPONENTS . $Attrute["component"])) {
                     System::Load(DIR_COMPONENTS . $Attrute["component"] . DIRECTORY_SEPARATOR . $Attrute["component"] . "Component.php");
                     $class = new ReflectionClass($Attrute["component"] . "\\" . $Attrute["component"] . "Component");
                     if (is_file(DIR_COMPONENTS . $Attrute["component"] . DIRECTORY_SEPARATOR . "index.html")) {
-                        $obj = $class->newInstance(file_get_contents(DIR_COMPONENTS . $Attrute["component"] . DIRECTORY_SEPARATOR . (isset($Attrute["view"])?$Attrute["view"].".html":"index.html")));
+                        $obj = $class->newInstance(file_get_contents(DIR_COMPONENTS . $Attrute["component"] . DIRECTORY_SEPARATOR . (isset($Attrute["view"]) ? $Attrute["view"] . ".html" : "index.html")));
                     } else {
                         $obj = $class->newInstance("");
                     }
+                    $Attrute["store"]="stock";
                 } else {
-                    Errors::Exception("{$Attrute["class"]} Component Exist Please Check Again");
+                    Errors::Exception("{$Attrute["component"]} Component Exist Please Check Again");
                 }
                 $obj->Attrute = $Attrute;
                 foreach ($Attrute as $key => $value) {
@@ -131,6 +148,10 @@ class Block
                 }
                 $component[$Attrute["name"]] = $obj;
             }
+            /*
+             * è£…è½½ç»„ä»¶
+             */
+
             $this->Component = $component;
         }
     }
@@ -146,7 +167,7 @@ class Block
                     $compontent->View = $compontent->RenderView();
                 } else {
                     $compontent->View = $compontent->Body;
-                    if (preg_match_all("/\\$([^ };\"]+)/", $compontent->View, $match))//¼ì²âviewÒÔ$¿ªÍ·µÄ×Ö·û´®
+                    if (preg_match_all("/\\$([^ };\"]+)/", $compontent->View, $match))//æ£€æµ‹viewä»¥$å¼€å¤´çš„å­—ç¬¦ä¸²
                     {
 
                         foreach ($match[0] as $key => $value) {
@@ -171,7 +192,7 @@ class Block
     }
 
     /*
-     * ·ÖÎöHtmlÍ·²¿ÉèÖÃ
+     * åˆ†æHtmlå¤´éƒ¨è®¾ç½®
      */
     public function ReplaceArgs(&$obj)
     {
@@ -179,15 +200,19 @@ class Block
             foreach ($obj->Attribute as $key => &$value) {
                 $value = str_replace("SERVER_COMMOM/", SERVER_COMMOM, $value);
                 $value = str_replace("SERVER_HOME/", SERVER_HOME, $value);
-                $value = str_replace("LACOL/", SERVER_HOME . App::$Appname . "/Component/$this->component/", $value);
-                $value = str_replace("COMPONENTS/",SERVER_COMPONENT . "$this->component/", $value);
+                if($this->store=="local")
+                {
+                    $value = str_replace("COMPONENTS/", SERVER_HOME . App::$Appname . "/Component/$this->component/", $value);
+                }else if($this->store=="stock"){
+                    $value = str_replace("COMPONENTS/", SERVER_COMPONENT . "$this->component/", $value);
+                }
             }
         }
     }
 
     public function AnalyHead()
     {
-        if (func_num_args()) {//Ã»ÓĞ´«²ÎÊ±·ÖÎöcontentµÄÍ·²¿£¬ÓĞÊ±·ÖÎö´«Èë×Ö·û´®
+        if (func_num_args()) {//æ²¡æœ‰ä¼ å‚æ—¶åˆ†æcontentçš„å¤´éƒ¨ï¼Œæœ‰æ—¶åˆ†æä¼ å…¥å­—ç¬¦ä¸²
             $target = func_get_arg(0);
             if (preg_match_all("/<\s*(\S*)(\s*\S*\s*=\s*(['\"])[\s\S]*?\\3)*\s*(\/>|>([\S\s]*?)<\/\\1>)/i", $target, $match)) {
                 foreach ($match[0] as $key => $value) {
@@ -212,7 +237,7 @@ class Block
     {
         $this->Content = $text;
 
-        if (preg_match("/<\s*html[\s\S]*?>[\s\S]*?<\/\s*html\s*>/i", $this->Content))//ÅĞ¶ÏÒ³ÃæÊÇ·ñÊÇÍêÕûµÄHTML½á¹¹
+        if (preg_match("/<\s*html[\s\S]*?>[\s\S]*?<\/\s*html\s*>/i", $this->Content))//åˆ¤æ–­é¡µé¢æ˜¯å¦æ˜¯å®Œæ•´çš„HTMLç»“æ„
         {
             $this->IsCompletion = true;
 
@@ -221,17 +246,17 @@ class Block
             } else
                 Errors::Exception("Structure Of Page Is Incomplete");
         } else {
-            $this->Body = $this->Content;//ÎŞhtmlÍêÕû½á¹¹£¬ContentÄÚÈİ¼°BodyÄÚÈİ
+            $this->Body = $this->Content;//æ— htmlå®Œæ•´ç»“æ„ï¼ŒContentå†…å®¹åŠBodyå†…å®¹
         }
         $this->LoadComponent();
     }
 
     /*
-     * ÓÃÓÚ¹ÒÔÚ×é¼ş
+     * ç”¨äºæŒ‚åœ¨ç»„ä»¶
      */
     public function Start()
     {
-    }//Ò³Ãæ¼ÓÔØº¯Êı
+    }//é¡µé¢åŠ è½½å‡½æ•°
 
     public function __get($value)
     {
