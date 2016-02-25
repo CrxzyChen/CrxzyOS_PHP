@@ -11,19 +11,29 @@ namespace Uploader;
 
 class UploaderComponent extends \Block
 {
-    private $BufferPool = DIR_HOME . "UploadBuffer" . DIRECTORY_SEPARATOR;
-    private $TargetPath = DIR_HOME . "Upload";
+    private $BufferPool = "";
+    private $TargetPath = "";
+    public $address = "";
+    public $handle = "";
     private $filePath = '';
     private $fileName = '';
     private $chunk = '';
     private $chunks = '';
     private $fileType = '';
-    public $handle = "";
 
     public function Start()
     {
+        if($this->address!="")
+        {
+            $this->BufferPool = $this->address.DIRECTORY_SEPARATOR."UploadBuffer";
+            $this->TargetPath = $this->address.DIRECTORY_SEPARATOR. "Upload";
+        }
+        else
+        {
+            $this->BufferPool = DIR_HOME . "UploadBuffer";
+            $this->TargetPath = DIR_HOME . "Upload";
+        }
     }
-
     public function submit()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
@@ -59,7 +69,7 @@ class UploaderComponent extends \Block
         // Create target dir
 
         if (!file_exists($this->BufferPool)) {
-            @mkdir($this->BufferPool);//创建目标路径
+            @mkdir($this->BufferPool,0777,true);//创建目标路径
         }
 
         // Create target dir
@@ -89,7 +99,7 @@ class UploaderComponent extends \Block
 
         // Open temp file
         //echo "{$filePath}_{$this->chunk}.parttmp";
-        if (!$out = @fopen("{$filePath}_{$this->chunk}.parttmp", "wb")) {
+        if (!$out = fopen("{$filePath}_{$this->chunk}.parttmp", "wb")) {
             die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
         }
 

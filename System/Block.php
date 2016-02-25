@@ -16,6 +16,8 @@ class Block
     public $Body = '';
     public $Attrute = '';
     public $IsCompletion = '';//是否是完整结构
+    public $ComponentPath = '';//记录当前组件位置;
+    public $ComponentUrl = '';//记录当前组件Url地址
 
     /*
      * 用于存放
@@ -76,22 +78,24 @@ class Block
             out:
         }
     }
-    public function recurse_copy($src,$dst) {  // 原目录，复制到的目录
+
+    public function recurse_copy($src, $dst)
+    {  // 原目录，复制到的目录
 
         $dir = opendir($src);
         @mkdir($dst);
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                if ( is_dir($src . '/' . $file) ) {
-                    $this->recurse_copy($src . '/' . $file,$dst . '/' . $file);
-                }
-                else {
-                    copy($src . '/' . $file,$dst . '/' . $file);
+        while (false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
+                if (is_dir($src . '/' . $file)) {
+                    $this->recurse_copy($src . '/' . $file, $dst . '/' . $file);
+                } else {
+                    copy($src . '/' . $file, $dst . '/' . $file);
                 }
             }
         }
         closedir($dir);
-    }
+    }//文件夹拷贝
+
     public function LoadComponent()
     {
         if (preg_match_all("/(<)component[\s\S]*?(>)<\/component(>)/i", $this->Body, $match, PREG_OFFSET_CAPTURE)) {
@@ -122,12 +126,14 @@ class Block
                     } else {
                         $obj = $class->newInstance("");
                     }
-                    $Attrute["store"]="local";
+                    $Attrute["ComponentPath"] = DIR_HOME . App::$Appname . "/Component/{$Attrute["component"]}/";
+                    $Attrute["ComponentUrl"] = SERVER_HOME . App::$Appname . "/Component/{$Attrute["component"]}/";
                 } else if (isset($Attrute["inherit"]) && $Attrute["inherit"] == true && is_dir(DIR_COMPONENTS . $Attrute["component"])) {
-                    $this->recurse_copy(DIR_COMPONENTS . $Attrute["component"],App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"]);
-                    $file = file_get_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"].DIRECTORY_SEPARATOR . $Attrute["component"] ."Component.php");
-                    file_put_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"].DIRECTORY_SEPARATOR . $Attrute["component"] ."Component.php",preg_replace("/namespace\s*\S*?;/i","namespace ".App::$Appname.";",$file));
-                    $Attrute["store"]="local";
+                    $this->recurse_copy(DIR_COMPONENTS . $Attrute["component"], App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"]);
+                    $file = file_get_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"] . DIRECTORY_SEPARATOR . $Attrute["component"] . "Component.php");
+                    file_put_contents(App::$Path . "Component" . DIRECTORY_SEPARATOR . $Attrute["component"] . DIRECTORY_SEPARATOR . $Attrute["component"] . "Component.php", preg_replace("/namespace\s*\S*?;/i", "namespace " . App::$Appname . ";", $file));
+                    $Attrute["ComponentPath"] = DIR_HOME . App::$Appname . "/Component/{$Attrute["component"]}/";
+                    $Attrute["ComponentUrl"] = SERVER_HOME . App::$Appname . "/Component/{$Attrute["component"]}/";
                 } else if (is_dir(DIR_COMPONENTS . $Attrute["component"])) {
                     System::Load(DIR_COMPONENTS . $Attrute["component"] . DIRECTORY_SEPARATOR . $Attrute["component"] . "Component.php");
                     $class = new ReflectionClass($Attrute["component"] . "\\" . $Attrute["component"] . "Component");
@@ -136,7 +142,8 @@ class Block
                     } else {
                         $obj = $class->newInstance("");
                     }
-                    $Attrute["store"]="stock";
+                    $Attrute["ComponentPath"] = DIR_COMPONENTS . "{$Attrute["component"]}/";
+                    $Attrute["ComponentUrl"] = SERVER_COMPONENT . "{$Attrute["component"]}/";
                 } else {
                     Errors::Exception("{$Attrute["component"]} Component Exist Please Check Again");
                 }
@@ -166,7 +173,6 @@ class Block
                 if ($compontent->Component) {
                     $compontent->View = $compontent->RenderView();
                 } else {
-                    $compontent->View = $compontent->Body;
                     if (preg_match_all("/\\$([^ };\"]+)/", $compontent->View, $match))//检测view以$开头的字符串
                     {
 
@@ -196,18 +202,22 @@ class Block
      */
     public function ReplaceArgs(&$obj)
     {
+        /*
+         * 替换head内全局变量
+         */
         if ($obj->Attribute) {
             foreach ($obj->Attribute as $key => &$value) {
                 $value = str_replace("SERVER_COMMOM/", SERVER_COMMOM, $value);
                 $value = str_replace("SERVER_HOME/", SERVER_HOME, $value);
-                if($this->store=="local")
-                {
-                    $value = str_replace("COMPONENTS/", SERVER_HOME . App::$Appname . "/Component/$this->component/", $value);
-                }else if($this->store=="stock"){
-                    $value = str_replace("COMPONENTS/", SERVER_COMPONENT . "$this->component/", $value);
-                }
+                $value = str_replace("COMPONENTS/", $this->ComponentUrl, $value);
             }
         }
+        /*
+         * 替换body内全局变量
+         */
+        $this->View = str_replace("SERVER_COMMOM/", SERVER_COMMOM, $this->Body);
+        $this->View = str_replace("SERVER_HOME/", SERVER_HOME, $this->View);
+        $this->View = str_replace("COMPONENTS/", $this->ComponentUrl, $this->View);
     }
 
     public function AnalyHead()
@@ -236,6 +246,7 @@ class Block
     public function __construct($text)
     {
         $this->Content = $text;
+
 
         if (preg_match("/<\s*html[\s\S]*?>[\s\S]*?<\/\s*html\s*>/i", $this->Content))//判断页面是否是完整的HTML结构
         {
