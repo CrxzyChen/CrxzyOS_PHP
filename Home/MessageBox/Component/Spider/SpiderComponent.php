@@ -27,6 +27,7 @@ class SpiderComponent extends \Block
     private $keycode = "";
     private $target = "";
     public $cookie_jar = "";
+    private $username="";
     private function Init()
     {
         $ch = curl_init();
@@ -132,8 +133,7 @@ class SpiderComponent extends \Block
             $this->Init();
         }
     }
-    public function Form()
-    {
+    public function Login(){
         $ch = curl_init();
         $this->postData["__VIEWSTATE"] = $_SESSION["__VIEWSTATE"];
         $this->postData["__VIEWSTATEGENERATOR"] = isset($_SESSION["__VIEWSTATEGENERATOR"])?$_SESSION["__VIEWSTATEGENERATOR"]:"";
@@ -150,111 +150,199 @@ class SpiderComponent extends \Block
         curl_setopt($ch,  CURLOPT_FOLLOWLOCATION, 1);
         $output=curl_exec($ch);
         $output = iconv("GB2312//IGNORE", "UTF-8", $output) ;
+        file_put_contents("test.html",$output);
+
         curl_close($ch);
         if(preg_match("/欢迎您/i",$output))
         {
             echo "操作成功！";
             unset($_SESSION["__VIEWSTATE"]);
+            preg_match("/>(\S*)同学/i",$output,$match);
+            $this->username = iconv("UTF-8","GB2312//IGNORE",$match[1]);
+            return true;
         }
         else if(preg_match("/ERROR/i",$output)){
             echo "系统繁忙，请稍后重试！";
             unset($_SESSION["__VIEWSTATE"]);
-            return 0;
+            return false;
         }else {
             preg_match("/alert\('([\s\S]*?)'\)/",$output,$match);
             echo $match[1];
             unset($_SESSION["__VIEWSTATE"]);
-            return 0;
+            return false;
         }
+    }
+    public function GetSchedule()
+    {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie_jar);
-        curl_setopt($ch,CURLOPT_REFERER,"http://jmis.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xs_main.aspx?xh=2013014106");
-        curl_setopt($ch, CURLOPT_URL, "http://jmis.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xskbcx.aspx?xh=2013014106&xm=%B3%C2%D0%F1%D1%F4&gnmkdm=N121603");
+        curl_setopt($ch,CURLOPT_REFERER,"http://jmis.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xs_main.aspx?xh={$_POST["username"]}");
+        curl_setopt($ch, CURLOPT_URL, "http://jmis.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xskbcx.aspx?xh={$_POST["username"]}&xm=$this->username&gnmkdm=N121603");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch,CURLOPT_AUTOREFERER,true);
         curl_setopt($ch,  CURLOPT_FOLLOWLOCATION, 1);
         $output = curl_exec($ch);
-        $output = iconv("GB2312//IGNORE", "UTF-8", $output) ;
+        $output = iconv("GB2312", "UTF-8//IGNORE", $output) ;
         file_put_contents("test.html",$output);
+
+        /*
+         * 获取当前学期
+         */
+        preg_match_all("/selected[\s\S]*?>([\s\S]*?)</",$output,$match);
+        $this->result["Time"]["year"] = $match[1][0];
+        $this->result["Time"]["term"] = $match[1][1];
+        /*
+         * 获取学生信息
+         */
+        preg_match("/学号：([\s\S]*?)</",$output,$match);
+        $this->result["Student"]["student_num"] = $match[1];
+        preg_match("/姓名：([\s\S]*?)</",$output,$match);
+        $this->result["Student"]["student_name"] = $match[1];
+        preg_match("/行政班：([\s\S]*?)</",$output,$match);
+        $this->result["Student"]["student_class"] = $match[1];
+        preg_match("/专业：([\s\S]*?)</",$output,$match);
+        $this->result["Student"]["student_major"] = $match[1];
+        preg_match("/学院：([\s\S]*?)</",$output,$match);
+        $this->result["Student"]["student_academy"] = $match[1];
+        /*
+         * 获取课程信息
+         */
         preg_match('/<table id=\"Table1\"[\s\S]*?>([\S\s]*?)<\/table>/i',$output,$Page);
-        preg_match_all('/<td align="Center"[^>]*?>([^&]*?)<\/td>/i',$Page[0],$Page);
-        $checkexam = array();
-        foreach($Page[1] as $var)
+        preg_match_all("/<tr>([\s\S]*?)<\/tr>/",$Page[0],$match);
+        array_shift($match[1]);
+        array_shift($match[1]);
+        $table=array(array());//用于记录表格指针
+        for($i = 0;$i<13;$i++)
         {
-            if(preg_match('/(\x{661f}\x{671f})/u',$var))
-                continue;
-            $vars = explode("<br>",$var);
-            preg_match('/\x{5468}([\S]*?)\x{7b2c}([\S]*?)\x{8282}\{\x{7b2c}([\S]*?)\x{5468}\}/iu',$vars[1],$buff);
-            array_shift($buff);
-            switch($buff[0])
+            for($j=1;$j<=7;$j++)
+                $table[$i][$j]=0;
+        }
+        foreach($match[1] as $key=>$value)
+        {
+            $y=1;
+            preg_match_all("/<td[\s\S]*?>([\s\S]*?)<\/td>/",$value,$buff);
+            foreach($buff[0] as $key2=>$value2)
             {
-                case '一':
-                    $buff[0] = 1;
-                    break;
-                case '二':
-                    $buff[0] = 2;
-                    break;
-                case '三':
-                    $buff[0] = 3;
-                    break;
-                case '四':
-                    $buff[0] = 4;
-                    break;
-                case '五':
-                    $buff[0] = 5;
-                    break;
-                case '六':
-                    $buff[0] = 6;
-                    break;
-                case '七':
-                    $buff[0] = 7;
-            }
-            $vars[1] = $buff;
-            $buff[1] = explode(',',$buff[1]);
-
-            foreach ($buff[1] as $buff2)
-            {
-                $Class["course_num"] = md5($vars[2].$vars[0]);
-                $Class["week"] = $buff[0];
-                $Class["time"] = $buff2;
-                $Class["course_name"] = $vars[0];
-                $Class["course_interval"] = $vars[1][2];
-                $Class["teacher"] = $vars[2];
-                $Class["classroom"] = $vars[3];
-
-                $this->result["Course"][] = $Class;
-            }
-
-            if (isset($vars[4]))
-            {
-                preg_match("/([\S]*?)\(/", $vars[4], $buff);
-                preg_match('/\((\S*?)\)/', $vars[4], $buff2);
-
-                $Week = $this->DateToWeek($buff[1]);
-
-                $Exam['exam_num'] = md5($vars[0].$buff2[1]);
-                $Exam['exam_name'] = $vars[0];
-                $Exam['week'] = $Week[0];
-                $Exam['date'] = $buff[1];
-                $Exam['time'] = $buff2[1];
-
-                if(!isset($checkexam[$Week[0]][$Exam['time']]))
+                while($table[$key][$y])
                 {
-                    $checkexam[$Week[0]][$Exam['time']]=1;
-                    $this->result["Exam"][] = $Exam;
+                    $y++;
                 }
+
+                if(preg_match("/<td[^>]*?>(上午|下午|晚上)<\/td>/",$value2))
+                    continue;
+                if(preg_match("/<td[^>]*?>第\S{1,2}节<\/td>/",$value2))
+                {
+                    continue;
+                }
+                if(preg_match("/<td[^>]*?>&nbsp;<\/td>/",$value2))
+                {
+                    $y++;
+                    continue;
+                }
+
+
+                preg_match("/<td[^>]*?rowspan=\"(\S*)\"[^>]*?>([\s\S]*?)<\/td>/",$value2,$buff2);
+                if(!sizeof($buff2))
+                {
+                    preg_match("/<td[^>]*?>([\s\S]*?)<\/td>/",$value2,$buff2);
+                    $buff2[2]=$buff2[1];
+                    $buff2[1]=1;
+                }
+
+                for($i = 0;$i<$buff2[1];$i++)
+                    $table[$key+$i][$y]=1;
+
+                $buff2[2] = explode("<br>",$buff2[2]);
+                preg_match("/\{([\s\S]*?)\}/",$buff2[2][1],$buff3);
+                $Class["course_interval"] = $buff3[1];
+                $Class["course_num"] = md5($buff2[2][0].$buff2[2][2]);
+                $Class["week"] = $y;
+                $Class["course_name"] = $buff2[2][0];
+                $Class["teacher"] = $buff2[2][2];
+                $Class["classroom"] = $buff2[2][3];
+                switch(sizeof($buff2[2]))
+                {
+                    case 5:
+                        preg_match("/([\S]*?)\(/", $buff2[2][4], $buff3);
+                        preg_match('/\((\S*?)\)/', $buff2[2][4], $buff4);
+
+                        $Week = $this->DateToWeek($buff3[1]);
+
+                        $Exam['exam_num'] = md5($buff2[2][0].$buff4[1]);
+                        $Exam['exam_name'] = $buff2[2][0];
+                        $Exam['week'] = $Week[0];
+                        $Exam['date'] = $buff3[1];
+                        $Exam['time'] = $buff4[1];
+
+                        if(!isset($checkexam[$Week[0]][$Exam['time']]))
+                        {
+                            $checkexam[$Week[0]][$Exam['time']]=1;
+                            $this->result["Exam"][] = $Exam;
+                        }
+                        break;
+                    case 9:
+                        for($i = 0;$i<$buff2[1];$i++)
+                        {
+                            $Class["time"] = $key+1+$i;
+                            $this->result["Course"][] = $Class;
+                        }
+                        var_dump($buff2[2]);
+                        $Class["course_num"] = md5($buff2[2][5].$buff2[2][7]);
+                        $Class["week"] = $y;
+                        $Class["course_name"] = $buff2[2][5];
+                        $Class["teacher"] = $buff2[2][7];
+                        $Class["classroom"] = $buff2[2][8];
+                        break;
+                }
+
+                for($i = 0;$i<$buff2[1];$i++)
+                {
+                    $Class["time"] = $key+1+$i;
+                    $this->result["Course"][] = $Class;
+                }
+                $y++;
             }
         }
-        var_dump($this->result);
+
+    }
+    public function Save()
+    {
+        $count = $this->db->view("student")->where("`student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
+        if(!$count)
+        {
+            $this->db->view("student")->insert($this->result["Student"]);
+        }
         foreach($this->result["Course"] as $value){
-            $count = $this->db->view("course")->where("`course_num`='{$value["course_num"]}' && `week`='{$value["week"]}' &&　`time`='{$value["time"]}'")->select()->num;
+            $count = $this->db->view("course")->where("`course_num`='{$value["course_num"]}' && `week`='{$value["week"]}' && `time`='{$value["time"]}'")->select()->num;
             if(!$count)
                 $this->db->view("course")->insert($value);
+            $count = $this->db->view("student_course")->where("`course_num`='{$value["course_num"]}' && `student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
+            if(!$count)
+            {
+                $array = array("student_num"=>$this->result["Student"]["student_num"],"course_num"=>$value["course_num"]);
+                $array = array_merge($array,$this->result["Time"]);
+                $this->db->view("student_course")->insert($array);
+            }
         }
         foreach($this->result["Exam"] as $value){
             $count = $this->db->view("exam")->where("`exam_num`='{$value["exam_num"]}'")->select()->num;
             if(!$count)
                 $this->db->view("exam")->insert($value);
+            $count = $this->db->view("student_exam")->where("`exam_num`='{$value["exam_num"]}' && `student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
+            if(!$count)
+            {
+                $array = array("student_num"=>$this->result["Student"]["student_num"],"exam_num"=>$value["exam_num"]);
+                $array = array_merge($array,$this->result["Time"]);
+                $this->db->view("student_exam")->insert($array);
+            }
+        }
+    }
+    public function Form()
+    {
+        if($this->Login())
+        {
+            $this->GetSchedule();
+            $this->Save();
         }
     }
 }

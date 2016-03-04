@@ -112,13 +112,6 @@ class DatabaseComponent extends \Block
         $sql = "insert into `$this->table` ($field)values($column)";
         $this->result = $this->connent->prepare($sql);
         $this->result->execute($this->condition[1]);
-        if (!$this->result) {
-            return $this->result;
-        } else {
-            \Errors::Exception($this->result->errorInfo()[2]);
-            return $this->connent->lastInsertId();
-        }
-
     }
 
     public function delete()
@@ -152,6 +145,5 @@ class DatabaseComponent extends \Block
                 return false;
             }
         }
-
     }
 }
