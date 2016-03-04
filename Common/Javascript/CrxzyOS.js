@@ -1,7 +1,18 @@
 /**
  * Created by –Ò—Ù on 2016/2/15.
  */
-var Urlhost = "http://"+window.location.host;
+var Urlhost = (function (){
+    var Tag = document.getElementsByTagName("script");
+    var Url = Tag[Tag.length-1].src;
+    Url = Url.split("/");
+    Url.pop();
+    Url.pop();
+    Url.pop();
+    Url.push("");
+    Url = Url.join("/");
+    return Url;
+})();
+
 
 $(function(){
     /*

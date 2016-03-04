@@ -28,7 +28,7 @@ define("SERVER_NAME",$_SERVER['SERVER_NAME']);//记录服务器名
 define("SERVER_TIMEZONE","PRC");//设置时区
 define("SERVER_PORT",$_SERVER['SERVER_PORT']);//记录服务器端口
 define("SERVER_ADD",$_SERVER['SCRIPT_NAME']);//记录系统入口地址
-define("SERVER_ROOT",($_SERVER[HTTPS]?"https://":"http://").SERVER_NAME.((SERVER_PORT==80)?"":(":".SERVER_PORT)).(dirname(SERVER_ADD)!="\\"?dirname(SERVER_ADD):dirname(SERVER_ADD).DIRECTORY_SEPARATOR));//记录客户端根目录
+define("SERVER_ROOT",($_SERVER[HTTPS]?"https://":"http://").SERVER_NAME.((SERVER_PORT==80)?"":(":".SERVER_PORT)).(dirname(SERVER_ADD)!="\\"?dirname(SERVER_ADD):"").DIRECTORY_SEPARATOR);//记录客户端根目录
 define("SERVER_COMMOM",SERVER_ROOT."Common".DIRECTORY_SEPARATOR);//记录客户端Common地址
 define("SERVER_HOME",SERVER_ROOT."Home".DIRECTORY_SEPARATOR);//记录客户端HOME地址
 define("SERVER_COMPONENT",SERVER_ROOT."Components".DIRECTORY_SEPARATOR);//记录客户端HOME地址
