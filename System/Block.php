@@ -172,15 +172,20 @@ class Block
 
                 if ($compontent->Component) {
                     $compontent->View = $compontent->RenderView();
-                } else {
-                    if (preg_match_all("/\\$([^ };\"]+)/", $compontent->View, $match))//检测view以$开头的字符串
-                    {
-
-                        foreach ($match[0] as $key => $value) {
-                            $compontent->View = str_replace($value, $compontent->{trim($match[1][$key])}, $compontent->View);
-                        }
+                }
+                if(preg_match_all("/\\$\{([\s\S]*?)\}/", $compontent->View, $match)){
+                    foreach ($match[0] as $key => $value) {
+                        $compontent->View = str_replace($value, eval("return {$match[1][$key]}"), $compontent->View);
                     }
                 }
+                if (preg_match_all("/\\$([_a-zA-Z][_a-zA-Z0-9]*(\[([0-9]+|\"[_a-zA-Z0-9]+\")\])*)/", $compontent->View, $match))//检测view以$开头的字符串
+                {
+                    foreach ($match[0] as $key => $value) {
+                        $compontent->View = str_replace($value, eval("return \$compontent->".trim($match[1][$key]).";"), $compontent->View);
+                    }
+                }
+
+
                 if (isset($compontent->Attrute["display"]) && $compontent->display == "hidden") {
                     $buff = str_split($body, $compontent->begin);
                     $buff2 = str_split($body, $compontent->end);

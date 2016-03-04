@@ -30,7 +30,15 @@ class DatabaseComponent extends \Block
     public function view($sql)
     {
         if (preg_match("/select[\s\S]*?from/i", $sql)) {
-            $this->result = $this->connent->query($sql)->fetch();
+            $result = $this->connent->query($sql);
+            if($result)
+            {
+                $this->result = "";
+                while ($row = $result->fetch())
+                {
+                    $this->result[] = $row;
+                }
+            }
             return $this->result;
         } else {
             $this->table = $sql;
@@ -63,6 +71,7 @@ class DatabaseComponent extends \Block
 
     public function select()
     {
+        $this->result = "";
         $sql = "select $this->field from $this->table " . (($this->condition[0]) ? "where {$this->condition[0]}" : "");
         $result = $this->connent->prepare($sql);
         $result->execute($this->condition[1]);
@@ -73,7 +82,10 @@ class DatabaseComponent extends \Block
         $this->result = new \stdClass();
         $this->result->num = $result->rowCount();
         $this->result->rows[] = $this->result->row = $result->fetch();
-        while ($this->result->rows[] = $result->fetch()) ;
+        while ($row = $result->fetch())
+        {
+            $this->result->rows[] = $row;
+        }
         $this->clear();
         return $this->result;
     }
