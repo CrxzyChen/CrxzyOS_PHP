@@ -175,7 +175,7 @@ class App
                 self::$MainController = "Controller";
             }
         } else
-            Error::Exception(DIR_HOME . self::$Appname . DIRECTORY_SEPARATOR . self::$Appname . "Controller.php Existn't ,Please Check Again");
+            Errors::Exception(DIR_HOME . self::$Appname . DIRECTORY_SEPARATOR . self::$Appname . "Controller.php Existn't ,Please Check Again");
         /*
          * 加载引用设置
          */
@@ -204,7 +204,7 @@ class App
                         $class = new ReflectionClass(self::$Appname . "\\" . $file . "Page");
                         self::$Page[$file] = $class->newInstance($content);
                     } else {
-                        Error::Exception(self::$Appname . "\\" . $file . "Controller Exist Please Try Again");
+                        Errors::Exception(self::$Appname . "\\" . $file . "Controller Exist Please Try Again");
                     }
                 } else {
                     self::$Page[$file] = new Block($content);
@@ -220,7 +220,6 @@ class App
         self::$Args["FILE"] =& $_FILES;
         self::$Args["COOKIE"] =& $_COOKIE;
         self::$Args["SESSION"] =& $_SESSION;
-
         /*
          * 获取应用名
          */
@@ -260,7 +259,6 @@ class App
         } else if (isset(self::$Args["COOKIE"]["componentName"])) {
             self::$CurrentComponentName = self::$Args["COOKIE"]["componentName"];
         }
-        self::$Args["SESSION"]["componentName"] = self::$CurrentComponentName ;//记录当前操作组件名
 
         if (isset(self::$Args["GET"]["requireKind"])) {
             self::$CurrentRequireKind = self::$Args["GET"]["requireKind"];
@@ -271,6 +269,5 @@ class App
         } else if (isset(self::$Args["COOKIE"]["requireKind"])) {
             self::$CurrentRequireKind = self::$Args["COOKIE"]["requireKind"];
         }
-        self::$Args["SESSION"]["requireKind"] = self::$CurrentRequireKind ;//记录当前操作组件
     }
 }

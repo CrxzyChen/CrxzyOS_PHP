@@ -5,6 +5,7 @@
  * Date: 2015/12/11
  * Time: 15:52
  */
+session_start();//开启session 功能
 
 /*
  * 加载系统配置

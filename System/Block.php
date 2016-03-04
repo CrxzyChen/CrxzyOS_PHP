@@ -66,7 +66,7 @@ class Block
     {
         $SRC = array();
         foreach ($this->Head as $key => $heads) {
-            if ($heads->Name == "script" && $heads->Attribute["src"] != null) {
+            if ($heads->Name == "script" && isset($heads->Attribute["src"])&&$heads->Attribute["src"] != null) {
                 foreach ($SRC as $src) {
                     if ($src == $heads->Attribute["src"]) {
                         unset($this->Head[$key]);
