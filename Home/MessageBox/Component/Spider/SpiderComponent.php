@@ -28,6 +28,7 @@ class SpiderComponent extends \Block
     private $target = "";
     public $cookie_jar = "";
     private $username="";
+    public $header = "jwgl";
     private function Init()
     {
         $ch = curl_init();
@@ -41,7 +42,7 @@ class SpiderComponent extends \Block
         {
             preg_match("/<a href='\/\((\S*?)\)/",$output,$match);
             $_SESSION["keycode"] = $this->keycode = $match[1];
-            $this->target = "http://jmis.buct.edu.cn/($this->keycode)/default2.aspx";
+            $this->target = "http://$this->header.buct.edu.cn/($this->keycode)/default2.aspx";
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL,$this->target );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -114,8 +115,8 @@ class SpiderComponent extends \Block
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie_jar);
-        curl_setopt($ch,CURLOPT_REFERER,"http://jmis.buct.edu.cn/".($this->keycode!=""?"($this->keycode)/":"")."CheckCode.aspx");
-        curl_setopt($ch, CURLOPT_URL, "http://jmis.buct.edu.cn/".($this->keycode!=""?"($this->keycode)/":"")."CheckCode.aspx");
+        curl_setopt($ch,CURLOPT_REFERER,"http://$this->header.buct.edu.cn/".($this->keycode!=""?"($this->keycode)/":"")."CheckCode.aspx");
+        curl_setopt($ch, CURLOPT_URL, "http://$this->header.buct.edu.cn/".($this->keycode!=""?"($this->keycode)/":"")."CheckCode.aspx");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch,CURLOPT_AUTOREFERER,true);
         curl_setopt($ch,  CURLOPT_FOLLOWLOCATION, 1);
@@ -126,7 +127,7 @@ class SpiderComponent extends \Block
     public function Start()
     {
         $this->cookie_jar = \App::$Path."pic.cookie";
-        $this->target = "http://jmis.buct.edu.cn/default2.aspx";
+        $this->target = "http://$this->header.buct.edu.cn/default2.aspx";
 
         if(!isset($_SESSION["__VIEWSTATE"]))
         {
@@ -176,8 +177,8 @@ class SpiderComponent extends \Block
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie_jar);
-        curl_setopt($ch,CURLOPT_REFERER,"http://jmis.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xs_main.aspx?xh={$_POST["username"]}");
-        curl_setopt($ch, CURLOPT_URL, "http://jmis.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xskbcx.aspx?xh={$_POST["username"]}&xm=$this->username&gnmkdm=N121603");
+        curl_setopt($ch,CURLOPT_REFERER,"http://$this->header.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xs_main.aspx?xh={$_POST["username"]}");
+        curl_setopt($ch, CURLOPT_URL, "http://$this->header.buct.edu.cn/".($_SESSION["keycode"]!=""?"({$_SESSION["keycode"]})/":"")."xskbcx.aspx?xh={$_POST["username"]}&xm=$this->username&gnmkdm=N121603");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch,CURLOPT_AUTOREFERER,true);
         curl_setopt($ch,  CURLOPT_FOLLOWLOCATION, 1);
