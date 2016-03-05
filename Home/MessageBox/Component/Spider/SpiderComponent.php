@@ -307,33 +307,33 @@ class SpiderComponent extends \Block
     }
     public function Save()
     {
-        $count = $this->db->view("student")->where("`student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
+        $count = $this->db2->view("student")->where("`student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
         if(!$count)
         {
-            $this->db->view("student")->insert($this->result["Student"]);
+            $this->db2->view("student")->insert($this->result["Student"]);
         }
         foreach($this->result["Course"] as $value){
-            $count = $this->db->view("course")->where("`course_num`='{$value["course_num"]}' && `week`='{$value["week"]}' && `time`='{$value["time"]}'")->select()->num;
+            $count = $this->db2->view("course")->where("`course_num`='{$value["course_num"]}' && `week`='{$value["week"]}' && `time`='{$value["time"]}'")->select()->num;
             if(!$count)
-                $this->db->view("course")->insert($value);
-            $count = $this->db->view("student_course")->where("`course_num`='{$value["course_num"]}' && `student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
+                $this->db2->view("course")->insert($value);
+            $count = $this->db2->view("student_course")->where("`course_num`='{$value["course_num"]}' && `student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
             if(!$count)
             {
                 $array = array("student_num"=>$this->result["Student"]["student_num"],"course_num"=>$value["course_num"]);
                 $array = array_merge($array,$this->result["Time"]);
-                $this->db->view("student_course")->insert($array);
+                $this->db2->view("student_course")->insert($array);
             }
         }
         foreach($this->result["Exam"] as $value){
-            $count = $this->db->view("exam")->where("`exam_num`='{$value["exam_num"]}'")->select()->num;
+            $count = $this->db2->view("exam")->where("`exam_num`='{$value["exam_num"]}'")->select()->num;
             if(!$count)
-                $this->db->view("exam")->insert($value);
-            $count = $this->db->view("student_exam")->where("`exam_num`='{$value["exam_num"]}' && `student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
+                $this->db2->view("exam")->insert($value);
+            $count = $this->db2->view("student_exam")->where("`exam_num`='{$value["exam_num"]}' && `student_num`='{$this->result["Student"]["student_num"]}'")->select()->num;
             if(!$count)
             {
                 $array = array("student_num"=>$this->result["Student"]["student_num"],"exam_num"=>$value["exam_num"]);
                 $array = array_merge($array,$this->result["Time"]);
-                $this->db->view("student_exam")->insert($array);
+                $this->db2->view("student_exam")->insert($array);
             }
         }
     }

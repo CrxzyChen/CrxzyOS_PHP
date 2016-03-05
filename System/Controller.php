@@ -17,8 +17,6 @@ class Controller
         }
 
         $component = array_reverse($component);
-
-
         foreach ($component as $value) {
             $value->Start();
         }
