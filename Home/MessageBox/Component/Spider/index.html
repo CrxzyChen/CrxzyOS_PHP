@@ -1,22 +1,144 @@
-<html lang="en">
+<html lang="cn">
 <head>
-    <script>
-        function back(html)
-        {
-            alert(html);
-            location.reload();
-        }
-    </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>时间统计</title>
+
+  <link rel="stylesheet" href="COMPONENTS/fonts.css"/>
+  <link rel="stylesheet" href="COMPONENTS/pace/themes/pace-theme-flash.css" />
+  <script src="COMPONENTS/pace/pace.js"></script>
+    
+  <link href="COMPONENTS/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="COMPONENTS/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
 </head>
-<body>
-    <Component component="Database" name="db2" host="localhost" database="student_schedule" password="Crxzy123520" username="root" display="hidden"></Component>
-    <label>用户名：</label>
-    <input name="username" type="text"/>
-    <label>密码：</label>
-    <input name="password" type="password"/>
-    <label>验证码：</label>
-    <input name="checkcode" type="text"/>
-    <img src="test.gif"/>
-    <button class="submit">提交</button>
-</body>
+<body class="font-hei">
+    <Component component="Database" name="db2" host="localhost" database="student_schedule" password="1234" username="root" display="hidden"></Component>
+    
+  <nav class="blue" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo"><img src="COMPONENTS/images/logo.png" alt="logo"></a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#">进入后台</a></li>
+      </ul>
+
+    </div>
+  </nav>
+
+<div class="section">
+  <div class="container">
+    <div class="row center">
+          <div class="card">
+            <div class="card-image">
+              <img src="COMPONENTS/images/bg3.jpg">
+              <span class="card-title">时间统计</span>
+            </div>
+            <div class="card-content">
+              <p>请输入你的教务网登录信息，我们将自动获取你的课程表，用来安排闲时表。</p>
+              <br><br>
+                <form class="col s12">
+
+                  <div class="row">
+                    <div class="input-field col s4">
+                      <input placeholder="请输入十位数学号" name="username" id="input_text" type="text" length="10" class="validate">
+  
+                      <label for="input_text">学号</label>
+                    </div>
+
+                    <div class="input-field col s4">
+                      <input placeholder="教务网的密码" name="password" id="password" type="password" class="validate">
+                      <label for="password">密码</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s3">
+                      <input id="code" name="checkcode" type="text" class="validate">
+                      <label for="code">验证码</label>
+                    </div>
+                    <img id="codeimg" src="test.gif" alt="验证码获取失败 请刷新重试">
+                  </div>
+                </form>
+                <div style="clear: both;"></div>
+            </div>
+            <div class="card-action">
+              <a class="submit" href="#">提交</a>
+              <!--<button class="submit">提交</button>-->
+            </div>
+          </div>
+      </div>
+
+
+  </div>
+</div>
+
+  <div class="container">
+    <div class="section">
+
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center light-blue-text"><i class="material-icons">快速</i></h2>
+            <h5 class="center">一分钟以内完成</h5>
+
+            <p class="light">我们使用专业的服务器，快速的网络连接，来保障服务的运行速度</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center light-blue-text"><i class="material-icons">方便</i></h2>
+            <h5 class="center">用户体验良好</h5>
+
+            <p class="light">精心设计的操作界面易于使用，简洁美观；注重实用性</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center light-blue-text"><i class="material-icons">高效</i></h2>
+            <h5 class="center">一次记录，永久使用</h5>
+
+            <p class="light">通过数据库的支持，系统做到智能分析与可视化导出，无论是使用者还是管理员，均能获得最大化的效率</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="page-footer blue">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 m6 s12">
+          <h5 class="white-text">学生网络中心</h5>
+          <p class="grey-text text-lighten-4">技术部 开发组 @2016</p>
+
+
+        </div>
+        <div class="col l3 m1 s12">
+          <h5 class="white-text"></h5>
+          <!-- <ul>
+            <li><a class="white-text" href="#!">Link 1</a></li>
+            <li><a class="white-text" href="#!">Link 2</a></li>
+          </ul> -->
+        </div>
+        <div class="col l3 m5 s12">
+          <h5 class="white-text">友情链接</h5>
+          <ul>
+            <li><a class="white-text" href="http://i.buct.edu.cn">胜古朝阳</a></li>
+            <li><a class="white-text" href="http://jwgl.buct.edu.cn">教务管理</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="COMPONENTS/js/jquery-2.1.3.min.js"></script>
+  <script src="COMPONENTS/js/materialize.min.js"></script>
+  <script src="COMPONENTS/js/init.js"></script>
+
+  </body>
 </html>

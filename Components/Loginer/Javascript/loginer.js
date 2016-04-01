@@ -1,5 +1,5 @@
 /**
- * Created by ÐñÑô on 2016/2/15.
+ * Created by æ—­é˜³ on 2016/2/15.
  */
 function back(response){
     alert(response);

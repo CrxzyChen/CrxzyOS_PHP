@@ -59,6 +59,7 @@ class Block
                 $this->Head = array_merge($this->Head, $component->GetHead());
             }
         }
+       
         return $this->Head;
     }
 
@@ -165,7 +166,7 @@ class Block
 
     public function RenderView()
     {
-        $body = $this->Body;
+        $body = $this->View;
         if ($this->Component) {
             $compontents = array_reverse($this->Component);
             foreach ($compontents as $compontent) {
@@ -185,8 +186,9 @@ class Block
                     }
                 }
 
-
-                if (isset($compontent->Attrute["display"]) && $compontent->display == "hidden") {
+              
+                if ($body&&isset($compontent->Attrute["display"]) && $compontent->display == "hidden") {
+                  
                     $buff = str_split($body, $compontent->begin);
                     $buff2 = str_split($body, $compontent->end);
                     array_shift($buff2);
@@ -220,6 +222,7 @@ class Block
         /*
          * 替换body内全局变量
          */
+         
         $this->View = str_replace("SERVER_COMMOM/", SERVER_COMMOM, $this->Body);
         $this->View = str_replace("SERVER_HOME/", SERVER_HOME, $this->View);
         $this->View = str_replace("COMPONENTS/", $this->ComponentUrl, $this->View);

@@ -14,7 +14,7 @@ session_start();//开启session 功能
 define("IS_DEBUG",true);//是否开启调试模式
 define("IS_LOGS",true);//是否开启日志
 define("IS_INTELLISENCE",true);//是否开启智能提示
-define("IS_DEFAULTHEAD",true);//是否使用默认前端头
+define("IS_DEFAULTHEAD",false);//是否使用默认前端头
 
 define("SYSTEM_VERSION", '0.0.2.0');//设置系统版本号
 define("SYSTEM_CHARSET","utf-8");//设置系统默认字符
@@ -28,7 +28,7 @@ define("SERVER_NAME",$_SERVER['SERVER_NAME']);//记录服务器名
 define("SERVER_TIMEZONE","PRC");//设置时区
 define("SERVER_PORT",$_SERVER['SERVER_PORT']);//记录服务器端口
 define("SERVER_ADD",$_SERVER['SCRIPT_NAME']);//记录系统入口地址
-define("SERVER_ROOT",($_SERVER[HTTPS]?"https://":"http://").SERVER_NAME.((SERVER_PORT==80)?"":(":".SERVER_PORT)).(dirname(SERVER_ADD)!="\\"?dirname(SERVER_ADD):"").DIRECTORY_SEPARATOR);//记录客户端根目录
+define("SERVER_ROOT",(isset($_SERVER['HTTPS'])?"https://":"http://").SERVER_NAME.((SERVER_PORT==80)?"":(":".SERVER_PORT)).(dirname(SERVER_ADD)!="\\"?dirname(SERVER_ADD):"").DIRECTORY_SEPARATOR);//记录客户端根目录
 define("SERVER_COMMOM",SERVER_ROOT."Common".DIRECTORY_SEPARATOR);//记录客户端Common地址
 define("SERVER_HOME",SERVER_ROOT."Home".DIRECTORY_SEPARATOR);//记录客户端HOME地址
 define("SERVER_COMPONENT",SERVER_ROOT."Components".DIRECTORY_SEPARATOR);//记录客户端HOME地址
@@ -36,7 +36,7 @@ define("SERVER_COMPONENT",SERVER_ROOT."Components".DIRECTORY_SEPARATOR);//记录
  * 记录访问者信息
  */
 define("USER_REMOTE_ADDR",$_SERVER['REMOTE_ADDR']);//记录浏览当前页面用户IP地址
-define("USER_REMOTE_HOST",$_SERVER['REMOTE_HOST']);//记录浏览当前页面用户主机名
+define("USER_REMOTE_HOST",isset($_SERVER['REMOTE_HOST'])?$_SERVER['REMOTE_HOST']:"");//记录浏览当前页面用户主机名
 define("USER_REMOTE_PORT",$_SERVER['REMOTE_PORT']);//用户连接到服务器时所使用的端口
 define("REQUEST_REMOTE_URL",$_SERVER['REQUEST_URI'] );//记录浏览页面的URL
 
@@ -57,4 +57,4 @@ define("DIR_COMPONENTS",DIR_ROOT."Components".DIRECTORY_SEPARATOR);
  */
 define("DB_USERNAME","root");
 define("DB_ADDREASS","127.0.0.1:3306");
-define("DB_PASSWORD","Crxzy123520");
+define("DB_PASSWORD","1234");

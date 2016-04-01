@@ -93,7 +93,9 @@ class App
         if (IS_DEBUG || !isset(self::$Cache[$Page])) {
             self::compile();
             return self::$Application->{self::$CurrentPage}->View;
+            
         } else {
+           
             $FileName=md5(self::$Appname.$Page);
             return self::$Cache[$FileName];
         }
