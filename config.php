@@ -14,7 +14,7 @@ session_start();//开启session 功能
 define("IS_DEBUG",true);//是否开启调试模式
 define("IS_LOGS",true);//是否开启日志
 define("IS_INTELLISENCE",true);//是否开启智能提示
-define("IS_DEFAULTHEAD",false);//是否使用默认前端头
+define("IS_DEFAULTHEAD",true);//是否使用默认前端头
 
 define("SYSTEM_VERSION", '0.0.2.0');//设置系统版本号
 define("SYSTEM_CHARSET","utf-8");//设置系统默认字符

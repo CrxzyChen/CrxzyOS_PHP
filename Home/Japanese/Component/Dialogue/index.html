@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="COMPONENTS/Javascript/dialogue.js"></script>
+</head>
+<body>
+<div class="panel panel-default">
+    <Component name="db" component="Database" host="localhost" username="root" password="Crxzy123520" display="hidden" database="japanese"></Component>
+    <div class="panel-heading " style="font-size: 90px;text-align: center" id="dialogue_word"></div>
+    <div class="panel-body">
+        <div style="width: 100%;height: 800px" id="dialogue_board">
+            <div style="padding-top: 300px">
+                <label style="width: 100%;font-size:80px;text-align: center;color: #aaa">Touch Me</label>
+            </div>
+        </div>
+        <div class="btn-group btn-group-justified" role="group" aria-label="...">
+            <div class="btn-group" role="group">
+                <button style="text-align: center;font-size: 60px" type="button" class="btn btn-default" id="know_button">
+                    知道</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button style="text-align: center;font-size: 60px" type="button" class="btn btn-default" id="unknow_button">不知道</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ĞñÑô
+ * User: ï¿½ï¿½ï¿½ï¿½
  * Date: 2016/2/6
  * Time: 13:25
  */
@@ -146,16 +146,17 @@ class DatabaseComponent extends \Block
             } else {
                 $set .= ",`$key`='$value'";
             }
-            $sql = "update `$this->table` set $set where $this->condition[0]";
+            $sql = "update `$this->table` set $set where {$this->condition[0]}";
+            var_dump($this->condition[0]);
             $this->result = $this->connent->prepare($sql);
             $this->result->execute($this->condition[1]);
-            $this->clear();
-            if ($this->result) {
-                return true;
-            } else {
+
+            if (!$this->result) {
                 \Errors::Exception($this->result->errorInfo()[2]);
                 return false;
             }
         }
+        $this->clear();
+        return true;
     }
 }

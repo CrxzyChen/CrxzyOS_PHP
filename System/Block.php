@@ -186,7 +186,6 @@ class Block
                     }
                 }
 
-              
                 if ($body&&isset($compontent->Attrute["display"]) && $compontent->display == "hidden") {
                   
                     $buff = str_split($body, $compontent->begin);
@@ -219,15 +218,7 @@ class Block
                 $value = str_replace("COMPONENTS/", $this->ComponentUrl, $value);
             }
         }
-        /*
-         * 替换body内全局变量
-         */
-         
-        $this->View = str_replace("SERVER_COMMOM/", SERVER_COMMOM, $this->Body);
-        $this->View = str_replace("SERVER_HOME/", SERVER_HOME, $this->View);
-        $this->View = str_replace("COMPONENTS/", $this->ComponentUrl, $this->View);
     }
-
     public function AnalyHead()
     {
         if (func_num_args()) {//没有传参时分析content的头部，有时分析传入字符串
@@ -248,6 +239,12 @@ class Block
                 }
             }
         }
+        /*
+       * 替换body内全局变量
+       */
+        $this->View = str_replace("SERVER_COMMOM/", SERVER_COMMOM, $this->Body);
+        $this->View = str_replace("SERVER_HOME/", SERVER_HOME, $this->View);
+        $this->View = str_replace("COMPONENTS/", $this->ComponentUrl, $this->View);
 
     }
 
